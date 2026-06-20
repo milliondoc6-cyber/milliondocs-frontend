@@ -1,7 +1,12 @@
-// ⚠️ Requires `npm install zustand` (see ARCHITECTURE.md disk-space note).
-// Cross-cutting CLIENT UI state that isn't tied to one feature. Feature-specific
-// client state lives in that feature's folder (e.g. features/auth/store.ts).
-import { create } from "zustand";
+"use client";
+
+// Cross-cutting CLIENT UI state that isn't tied to one domain.
+//
+// NOTE: this is a tiny zero-dependency store (React's useSyncExternalStore) so
+// the app builds without `zustand` installed (C: drive is full — see
+// ARCHITECTURE.md). The `useUiStore((s) => s.x)` selector API matches zustand,
+// so swapping to real zustand later is a one-line change.
+import { useSyncExternalStore } from "react";
 
 interface UiState {
   sidebarOpen: boolean;
@@ -9,8 +14,30 @@ interface UiState {
   setSidebarOpen: (open: boolean) => void;
 }
 
-export const useUiStore = create<UiState>((set) => ({
+let state: UiState;
+const listeners = new Set<() => void>();
+
+function setState(partial: Partial<UiState>) {
+  state = { ...state, ...partial };
+  listeners.forEach((l) => l());
+}
+
+state = {
   sidebarOpen: true,
-  toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
-  setSidebarOpen: (open) => set({ sidebarOpen: open }),
-}));
+  toggleSidebar: () => setState({ sidebarOpen: !state.sidebarOpen }),
+  setSidebarOpen: (open) => setState({ sidebarOpen: open }),
+};
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+/** Read UI state with a selector, e.g. `useUiStore((s) => s.sidebarOpen)`. */
+export function useUiStore<T>(selector: (s: UiState) => T): T {
+  return useSyncExternalStore(
+    subscribe,
+    () => selector(state),
+    () => selector(state),
+  );
+}
