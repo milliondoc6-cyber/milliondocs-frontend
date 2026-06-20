@@ -7,11 +7,12 @@ export interface ProductResponse {
   unit_of_measurement?: string | null; // Unit
   country_of_origin: string;
   hs_code?: string | null;
-  sell_price?: number | null;
-  buy_price?: number | null;
-  net_weight_kg?: number | null;
-  gross_weight_kg?: number | null;
-  cubic_measurement_m3?: number | null;
+  // The backend returns decimals as strings (e.g. "12.50"); accept both.
+  sell_price?: number | string | null;
+  buy_price?: number | string | null;
+  net_weight_kg?: number | string | null;
+  gross_weight_kg?: number | string | null;
+  cubic_measurement_m3?: number | string | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   custom_fields?: Record<string, any> | null;
   created_at: string;

@@ -6,6 +6,7 @@ import { Ship } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mainNav } from "@/config/nav";
 import { siteConfig } from "@/config/site";
+import { LogoutButton } from "@/components/layout/logout-button";
 
 export function AppSidebar() {
   const pathname = usePathname() || "";
@@ -44,13 +45,13 @@ export function AppSidebar() {
           );
         })}
       </nav>
-      {/* TODO: wire to features/auth/store.ts (current workspace/user) once auth lands. */}
-      <div className="p-4 border-t border-sidebar-border">
+      <div className="p-3 border-t border-sidebar-border space-y-2">
         <div className="rounded-lg bg-sidebar-accent/50 p-3">
           <div className="text-xs text-sidebar-foreground/70">Workspace</div>
           <div className="text-sm font-medium">Mehta Exports</div>
           <div className="text-[11px] text-sidebar-foreground/60 mt-1">Pro plan · 12 seats</div>
         </div>
+        <LogoutButton />
       </div>
     </aside>
   );

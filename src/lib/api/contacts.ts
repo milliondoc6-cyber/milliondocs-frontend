@@ -25,6 +25,7 @@ export const contactsApi = {
     const query = roles ? `?role=${roles.join(",")}` : "";
     return apiClient.get<ContactResponse[]>(`/contacts${query}`);
   },
+  roles: () => apiClient.get<string[]>("/contacts/roles"),
   create: (formData: FormData) =>
     apiClient.post<ContactResponse>("/contacts", formData),
   update: (id: string, formData: FormData) =>
