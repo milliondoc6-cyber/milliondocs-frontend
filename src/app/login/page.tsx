@@ -1,67 +1,136 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { AuthShell } from "@/components/auth-shell";
-import { api } from "@/lib/api";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("priya@mehtaexports.com");
-  const [password, setPassword] = useState("password123");
-  const [loading, setLoading] = useState(false);
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { AuthShell } from "@/components/layout/auth-shell";
+import { FormError } from "@/components/common/form-error";
+import { api, setToken, getErrorMessage, getErrorStatus } from "@/lib/api";
+import { loginSchema, type LoginValues } from "@/lib/validation/auth";
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+export default function LoginPage() {
+  const form = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+    mode: "onTouched", // validate a field once the user has left it
+  });
+
+  const onSubmit = async (values: LoginValues) => {
+    form.clearErrors("root");
     try {
-      // The backend login expects email and password
-      const res = await api.auth.login({ email, password });
-      localStorage.setItem("token", res.access_token);
-      toast.success("Successfully logged in!");
+      const res = await api.auth.login(values);
+      setToken(res.access_token);
+      toast.success("Welcome back!");
       window.location.href = "/dashboard";
-    } catch (err: any) {
-      toast.error(err.message || "Failed to sign in. Please verify your credentials.");
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      const status = getErrorStatus(err);
+      let message = getErrorMessage(err);
+
+      if (status === 401) {
+        // Wrong credentials — highlight both fields inline.
+        message = "Incorrect email or password.";
+        form.setError("email", { message: " " });
+        form.setError("password", { message: "Incorrect email or password" });
+      } else if (status === 403) {
+        // Account exists but the email isn't verified yet.
+        message = "Your email isn't verified yet. Please verify it to sign in.";
+      }
+
+      form.setError("root", { message });
     }
   };
 
+  const { isSubmitting, errors } = form.formState;
+
   return (
-    <AuthShell title="Sign in to MillionDocs" subtitle="Welcome back. Pick up where your shipments left off.">
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="space-y-1.5">
-          <Label htmlFor="email">Work email</Label>
-          <Input 
-            id="email" 
-            type="email" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+    <AuthShell
+      title="Sign in to MillionDocs"
+      subtitle="Welcome back. Pick up where your shipments left off."
+    >
+      <Form {...form}>
+        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)} noValidate>
+          <FormError message={errors.root?.message} />
+
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Work email</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@company.com"
+                    disabled={isSubmitting}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div className="space-y-1.5">
-          <div className="flex justify-between items-center">
-            <Label htmlFor="pw">Password</Label>
-            <Link href="/forgot-password" className="text-xs text-emerald hover:underline">Forgot?</Link>
-          </div>
-          <Input 
-            id="pw" 
-            type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center justify-between">
+                  <FormLabel>Password</FormLabel>
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-emerald hover:underline"
+                    tabIndex={-1}
+                  >
+                    Forgot?
+                  </Link>
+                </div>
+                <FormControl>
+                  <Input
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    disabled={isSubmitting}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Signing in..." : "Sign in"}
-        </Button>
-      </form>
+
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              "Sign in"
+            )}
+          </Button>
+        </form>
+      </Form>
+
       <p className="text-sm text-muted-foreground text-center mt-6">
-        New to MillionDocs? <Link href="/register" className="text-emerald font-medium hover:underline">Create account</Link>
+        New to MillionDocs?{" "}
+        <Link href="/register" className="text-emerald font-medium hover:underline">
+          Create account
+        </Link>
       </p>
     </AuthShell>
   );

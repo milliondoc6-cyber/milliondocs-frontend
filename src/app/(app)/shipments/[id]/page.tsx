@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Topbar } from "@/components/topbar";
+import { Topbar } from "@/components/layout/topbar";
 import { findShipment, findContact, findProduct, statusMeta } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, FileText, Download, Sparkles, Plus, Anchor, Truck, Package2, Upload, History, FileCheck2, Eye, Copy, MoreVertical, AlertTriangle } from "lucide-react";

@@ -1,4 +1,4 @@
-import { Topbar } from "@/components/topbar";
+import { Topbar } from "@/components/layout/topbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

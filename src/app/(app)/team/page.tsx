@@ -1,4 +1,4 @@
-import { Topbar } from "@/components/topbar";
+import { Topbar } from "@/components/layout/topbar";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";

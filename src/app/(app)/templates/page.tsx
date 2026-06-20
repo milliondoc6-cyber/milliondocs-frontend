@@ -1,4 +1,4 @@
-import { Topbar } from "@/components/topbar";
+import { Topbar } from "@/components/layout/topbar";
 import { Button } from "@/components/ui/button";
 import { FileText, Plus, Edit3, Copy, Trash2 } from "lucide-react";
 import * as React from "react";

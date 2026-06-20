@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AuthShell } from "@/components/auth-shell";
+import { AuthShell } from "@/components/layout/auth-shell";
 
 export default function ForgotPage() {
   return (

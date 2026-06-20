@@ -3,7 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import * as React from "react";
 
-export function Topbar({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
+export function Topbar({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+}) {
   return (
     <header className="h-16 border-b border-border bg-card/60 backdrop-blur flex items-center px-6 gap-4 sticky top-0 z-10">
       <div className="flex-1 min-w-0">

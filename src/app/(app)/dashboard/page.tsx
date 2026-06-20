@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Topbar } from "@/components/topbar";
+import { Topbar } from "@/components/layout/topbar";
 import { ArrowUpRight, Package, FileText, Clock, CheckCircle2, AlertTriangle, Plus, FileCheck2, Users, Boxes } from "lucide-react";
 import { shipments, findContact, statusMeta } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
