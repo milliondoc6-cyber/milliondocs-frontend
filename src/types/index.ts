@@ -5,7 +5,7 @@
 
 /** Standard paginated list envelope returned by the backend. */
 export interface Paginated<T> {
-  page: number;
+  page: number; //be
   page_size: number;
   total: number;
   items: T[];
