@@ -1,6 +1,7 @@
-import { Search, Bell, Plus } from "lucide-react";
+import { Search, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NewShipmentButton } from "@/components/shipments/new-shipment-button";
 import * as React from "react";
 
 export function Topbar({
@@ -27,11 +28,7 @@ export function Topbar({
       <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Notifications">
         <Bell className="h-4 w-4" />
       </Button>
-      {action ?? (
-        <Button size="sm" className="gap-1.5">
-          <Plus className="h-4 w-4" /> New shipment
-        </Button>
-      )}
+      {action ?? <NewShipmentButton className="gap-1.5" />}
       <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-emerald text-primary-foreground text-xs font-medium flex items-center justify-center">
         PK
       </div>

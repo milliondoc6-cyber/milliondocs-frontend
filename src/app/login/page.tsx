@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +9,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Form,
   FormControl,
@@ -27,6 +29,17 @@ export default function LoginPage() {
     defaultValues: { email: "", password: "" },
     mode: "onTouched", // validate a field once the user has left it
   });
+
+  // Surface why the user landed back here after a session timeout.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (new URLSearchParams(window.location.search).get("expired") === "1") {
+      form.setError("root", {
+        message: "Your session expired. Please sign in again.",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = async (values: LoginValues) => {
     form.clearErrors("root");
@@ -100,8 +113,7 @@ export default function LoginPage() {
                   </Link>
                 </div>
                 <FormControl>
-                  <Input
-                    type="password"
+                  <PasswordInput
                     autoComplete="current-password"
                     placeholder="••••••••"
                     disabled={isSubmitting}

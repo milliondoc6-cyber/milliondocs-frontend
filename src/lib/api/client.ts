@@ -82,6 +82,41 @@ export function getErrorMessage(error: unknown): string {
   return "Something went wrong. Please try again.";
 }
 
+/**
+ * Pull a human-readable message out of a FastAPI error body. FastAPI uses
+ * `detail` for HTTPException (a string) AND for 422 validation errors (an
+ * array of `{ loc, msg, type }`). Without handling the array case, validation
+ * errors render as "[object Object]". This normalizes all shapes to a string.
+ */
+function extractDetail(body: unknown): string | null {
+  if (!body || typeof body !== "object") return null;
+  const detail = (body as { detail?: unknown }).detail;
+
+  if (typeof detail === "string") return detail;
+
+  if (Array.isArray(detail)) {
+    const messages = detail
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (item && typeof item === "object" && "msg" in item) {
+          const { loc, msg } = item as { loc?: unknown[]; msg?: string };
+          // Drop the leading "body"/"query" scope so the field name is clear.
+          const field = Array.isArray(loc) ? loc.slice(1).join(".") : "";
+          return field ? `${field}: ${msg}` : String(msg);
+        }
+        return null;
+      })
+      .filter(Boolean);
+    if (messages.length) return messages.join(" • ");
+  }
+
+  if (detail && typeof detail === "object" && "msg" in detail) {
+    return String((detail as { msg?: unknown }).msg);
+  }
+
+  return null;
+}
+
 // `object` lets us accept named-interface payloads (e.g. RegisterPayload), which
 // don't structurally match Record<string, unknown>. Non-FormData bodies are JSON-encoded.
 type Body = BodyInit | Record<string, unknown> | object | undefined;
@@ -121,12 +156,26 @@ async function request<T>(
     let parsedBody: unknown;
     try {
       parsedBody = await response.json();
-      const detail =
-        (parsedBody as { detail?: string })?.detail ?? JSON.stringify(parsedBody);
+      const detail = extractDetail(parsedBody);
       if (detail) message = detail;
     } catch {
       // non-JSON error body — keep the default message
     }
+
+    // An expired/missing session on a protected endpoint: clear the token and
+    // bounce to login, instead of letting every page silently fail. Auth
+    // endpoints (login/register/verify) handle their own 401s.
+    if (response.status === 401 && typeof window !== "undefined") {
+      const isAuthCall =
+        endpoint === "/login" || endpoint === "/users" || endpoint === "/verify-otp";
+      if (!isAuthCall) {
+        clearToken();
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login?expired=1";
+        }
+      }
+    }
+
     throw new ApiError(response.status, message, parsedBody);
   }
 

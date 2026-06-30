@@ -35,12 +35,25 @@ export interface ShipmentResponse {
   pre_carriage_by?: ShipmentLookup | null;
 }
 
+export interface ShipmentListResponse {
+  page: number;
+  page_size: number;
+  total: number;
+  items: ShipmentResponse[];
+}
+
 export const shipmentsApi = {
+  list: (page = 1, pageSize = 10) =>
+    apiClient.get<ShipmentListResponse>(
+      `/shipments?page=${page}&page_size=${pageSize}`
+    ),
   get: (id: string) => apiClient.get<ShipmentResponse>(`/shipments/${id}`),
   create: (payload: Record<string, unknown>) =>
     apiClient.post<ShipmentResponse>("/shipments", payload),
   update: (id: string, payload: Record<string, unknown>) =>
     apiClient.patch<ShipmentResponse>(`/shipments/${id}`, payload),
-  delete: (id: string) =>
-    apiClient.delete<{ message: string }>(`/shipments/${id}`),
+  delete: (id: string, softDelete = true) =>
+    apiClient.delete<{ message: string }>(
+      `/shipments/${id}?soft_delete=${softDelete}`
+    ),
 };

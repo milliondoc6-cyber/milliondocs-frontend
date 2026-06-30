@@ -23,7 +23,7 @@ export default function SettingsPage() {
           </Card>
 
           <Card title="Document defaults">
-            <Row label="Default currency"><Input defaultValue="USD" /></Row>
+            <Row label="Default currency"><Input defaultValue="INR" /></Row>
             <Row label="Default incoterm"><Input defaultValue="FOB" /></Row>
             <Row label="Invoice prefix"><Input defaultValue="MD-" /></Row>
             <Row label="Footer text"><Input defaultValue="Thank you for your business." /></Row>

@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Form,
   FormControl,
@@ -281,8 +282,7 @@ export default function RegisterPage() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
+                  <PasswordInput
                     placeholder="At least 8 characters"
                     autoComplete="new-password"
                     disabled={isSubmitting}
@@ -301,8 +301,7 @@ export default function RegisterPage() {
               <FormItem>
                 <FormLabel>Confirm password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
+                  <PasswordInput
                     placeholder="Re-enter your password"
                     autoComplete="new-password"
                     disabled={isSubmitting}

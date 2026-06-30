@@ -7,8 +7,8 @@ import { format, formatDistanceToNow, parseISO } from "date-fns";
 
 export function formatCurrency(
   value: number,
-  currency = "USD",
-  locale = "en-US"
+  currency = "INR",
+  locale = "en-IN"
 ): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(value);
 }
